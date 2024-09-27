@@ -13,6 +13,7 @@
         <result property="username" column="username"/>
         <result property="password" column="password"/>
         <result property="email" column="email"/>
+        <result property="birth" column="birth"/>
         <result property="regDate" column="reg_date"/>
         <result property="updateDate" column="update_date"/>
         <collection property="authList" resultMap="authMap"/>
@@ -21,6 +22,7 @@
     <update id="update">
         UPDATE tbl_member
         SET email       = #{email},
+            password    = #{newPassword},
             update_date = now()
         WHERE username = #{username}
     </update>
@@ -33,7 +35,7 @@
     </update>
 
     <select id="get" resultMap="memberMap">
-        SELECT m.username, password, email, reg_date, update_date, auth
+        SELECT m.username, password, email,birth, reg_date, update_date, auth
         FROM tbl_member m
                  LEFT OUTER JOIN tbl_member_auth a
                                  ON m.username = a.username
@@ -47,7 +49,7 @@
 
     <insert id="insert">
         INSERT INTO tbl_member
-        VALUES (#{username}, #{password}, #{email}, now(), now(), null)
+        VALUES (#{username}, #{password}, #{email},#{birth}, now(), now())
     </insert>
 
     <insert id="insertAuth">

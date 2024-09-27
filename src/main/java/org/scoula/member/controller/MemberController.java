@@ -47,15 +47,25 @@ public class MemberController {
     }
 
     @PutMapping("/{username}")
-    public ResponseEntity<MemberDTO> changeProfile(MemberUpdateDTO member) {
-        return ResponseEntity.ok(service.update(member));
+    public ResponseEntity<MemberDTO> updateProfileOrPassword(
+            @PathVariable String username,
+            @ModelAttribute MemberUpdateDTO member) {
+
+        // 비밀번호가 변경되는 경우 처리
+        if (member.getNewPassword() != null && !member.getNewPassword().isEmpty()) {
+            ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO();
+            changePasswordDTO.setUsername(username);
+            changePasswordDTO.setOldPassword(member.getOldPassword());
+            changePasswordDTO.setNewPassword(member.getNewPassword());
+            service.changePassword(changePasswordDTO);
+        }
+
+        // 프로필 변경 (비밀번호 변경 외의 정보 업데이트)
+        MemberDTO updatedMember = service.update(member);
+
+        return ResponseEntity.ok(updatedMember);
     }
 
-    @PutMapping("/{username}/changepassword")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        service.changePassword(changePasswordDTO);
-        return ResponseEntity.ok().build();
-    }
 
 
 }

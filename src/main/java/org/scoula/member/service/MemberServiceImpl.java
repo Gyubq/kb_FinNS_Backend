@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.NoSuchElementException;
-
 import java.util.Optional;
 
 @Slf4j
@@ -31,8 +30,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean checkDuplicate(String username) {
         MemberVO member = mapper.findByUsername(username);
-        // true : db에 해당아이디 정보가 이미 있음
-        return member != null ? true : false;
+        // true : db에 해당 아이디 정보가 이미 있음
+        return member != null;
     }
 
     @Override
@@ -43,13 +42,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void saveAvatar(MultipartFile avatar, String username) {
-        //아바타 업로드
+        // 아바타 업로드
         if (avatar != null && !avatar.isEmpty()) {
             File dest = new File("c:/upload/avatar", username + ".png");
             try {
                 avatar.transferTo(dest);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("아바타 업로드 실패", e);
             }
         }
     }
@@ -70,35 +69,55 @@ public class MemberServiceImpl implements MemberService {
         auth.setUsername(member.getUsername());
         auth.setAuth("ROLE_MEMBER");
 
-        mapper.insertAuth(auth); // 유저 권한 정ㄴ보 db에 저장
+        mapper.insertAuth(auth); // 유저 권한 정보 DB에 저장
 
         saveAvatar(dto.getAvatar(), member.getUsername());
 
-        MemberDTO memberDTO = get(member.getUsername());
-        return memberDTO;
-
-//        return get(member.getUsername());
+        return get(member.getUsername());
     }
 
+    @Transactional
     @Override
     public MemberDTO update(MemberUpdateDTO member) {
-        MemberVO vo = mapper.get(member.getUsername());
-        if (!passwordEncoder.matches(member.getPassword(), vo.getPassword())) { // 비밀번호 일치 확인
-            throw new PasswordMissmatchException();
+        // 유저 조회 및 null 확인
+        MemberVO vo = Optional.ofNullable(mapper.get(member.getUsername()))
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자입니다."));
+
+        // 비밀번호가 존재하면 비밀번호 검증 및 변경
+        if (member.getOldPassword() != null && !member.getOldPassword().isEmpty()) {
+            if (!passwordEncoder.matches(member.getOldPassword(), vo.getPassword())) { // 기존 비밀번호 일치 확인
+                throw new PasswordMissmatchException();
+            }
+            // 새 비밀번호 암호화
+            String encodedNewPassword = passwordEncoder.encode(member.getNewPassword());
+            vo.setPassword(encodedNewPassword);
         }
-        mapper.update(member.toVO());
+
+        // 프로필 업데이트 (필요한 필드만 업데이트)
+        vo.setEmail(member.getEmail());
+        vo.setBirth(String.valueOf(member.getBirth()));
+
+        // DB에 업데이트
+        mapper.update(vo);
+
+        // 아바타 파일 저장
         saveAvatar(member.getAvatar(), member.getUsername());
+
         return get(member.getUsername());
     }
 
     @Override
     public void changePassword(ChangePasswordDTO changePassword) {
-        MemberVO member = mapper.get(changePassword.getUsername());
+        MemberVO member = Optional.ofNullable(mapper.get(changePassword.getUsername()))
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사용자입니다."));
+
+        // 이전 비밀번호 검증
         if (!passwordEncoder.matches(changePassword.getOldPassword(), member.getPassword())) {
             throw new PasswordMissmatchException();
         }
+
+        // 새 비밀번호 암호화 및 업데이트
         changePassword.setNewPassword(passwordEncoder.encode(changePassword.getNewPassword()));
         mapper.updatePassword(changePassword);
     }
-    
 }
