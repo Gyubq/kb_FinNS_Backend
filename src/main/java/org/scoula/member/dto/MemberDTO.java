@@ -15,32 +15,43 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class MemberDTO {
-    private String username;
-    private String email;
-    private String birth;
-    private Date regDate;
-    private Date updateDate;
+    private int user_no; // admin
+    private int card_no; //
+    private String user_id; //
+    private String name;
+    private String birthdate;
+    private String password;
+    private int mbti_no;
+    private String user_img_url;
+    private String update_date;
     MultipartFile avatar;
     private List<String> authList; // 권한 목록, join 처리 필요
 
     public static MemberDTO of(MemberVO m) {
         return MemberDTO.builder()
-                .username(m.getUsername())
-                .email(m.getEmail())
-                .birth(m.getBirth())
-                .regDate(m.getRegDate())
-                .updateDate(m.getUpdateDate())
-                .authList(m.getAuthList().stream().map(a -> a.getAuth()).toList())
+                .user_no(m.getUser_no())
+                .card_no(m.getCard_no())
+                .user_id(m.getUser_id())
+                .name(m.getName())
+                .birthdate(m.getBirthdate())
+                .password(m.getPassword())
+                .mbti_no(m.getMbti_no())
+                .user_img_url(m.getUser_img_url())
+                .update_date(m.getUpdate_date())
                 .build();
     }
 
     public MemberVO toVO() {
         return MemberVO.builder()
-                .username(username)
-                .email(email)
-                .birth(birth)
-                .regDate(regDate)
-                .updateDate(updateDate)
+                .user_no(user_no)
+                .card_no(card_no)
+                .user_id(user_id)
+                .name(name)
+                .birthdate(birthdate)
+                .password(password)
+                .mbti_no(mbti_no)
+                .user_img_url(user_img_url)
+                .update_date(update_date)
                 .build();
     }
 }

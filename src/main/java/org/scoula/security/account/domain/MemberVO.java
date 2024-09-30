@@ -14,14 +14,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class MemberVO {
-    private String username; // admin
-    private String password; //
-    private String email; //
-    private String birth;
-    private Date regDate;
-    private Date updateDate;
-
-    private List<AuthVO> authList;
-
+    private int user_no; // admin
+    private int card_no; //
+    private String user_id; //
+    private String name;
+    private String birthdate;
+    private String password;
+    private int mbti_no;
+    private String user_img_url;
+    private String update_date;
     UserDetails details;
 }

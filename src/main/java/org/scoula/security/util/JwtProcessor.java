@@ -30,7 +30,7 @@ public class JwtProcessor { // 헬퍼클래스란?
     // JWT Subject(username) 추출 - 해석 불가인 경우 예외 발생
 // 예외 ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException,
 // IllegalArgumentException
-    public String getUsername(String token) {
+    public String getUser_id(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

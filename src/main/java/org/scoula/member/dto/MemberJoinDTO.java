@@ -7,21 +7,23 @@ import lombok.NoArgsConstructor;
 import org.scoula.security.account.domain.MemberVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class MemberJoinDTO {
-    String username;
+    String user_id;
     String password;
-    String email;
-    MultipartFile avatar;
+    String birthdate;
+    private MultipartFile avatar; // 사용자 아바타 (이미지 파일)
 
     public MemberVO toVO() {
         return MemberVO.builder()
-                .username(username)
+                .user_id(user_id)
                 .password(password)
-                .email(email)
+                .birthdate(birthdate)
                 .build();
     }
 }

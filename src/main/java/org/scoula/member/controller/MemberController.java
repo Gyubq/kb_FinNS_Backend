@@ -19,12 +19,11 @@ import java.io.File;
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 public class MemberController {
-    // /api/member/checkusername/sangyeop0715
     final MemberService service;
 
-    @GetMapping("/checkusername/{username}")
-    public ResponseEntity<Boolean> checkUsername(@PathVariable String username) { // unsername = sangyeop0715
-        return ResponseEntity.ok().body(service.checkDuplicate(username)); // sangyeop0715
+    @GetMapping("/checkusername/{user_no}")
+    public ResponseEntity<Boolean> checkUsername(@PathVariable String user_no) { // unsername = sangyeop0715
+        return ResponseEntity.ok().body(service.findById(user_no)); // sangyeop0715
     }
 
     @PostMapping("")
@@ -36,9 +35,9 @@ public class MemberController {
 //        return ResponseEntity.ok(service.join(member));
     }
 
-    @GetMapping("/{username}/avatar")
-    public void getAvatar(@PathVariable String username, HttpServletResponse response) {
-        String avatarPath = "c:/upload/avatar/" + username + ".png";
+    @GetMapping("/{user_no}/avatar")
+    public void getAvatar(@PathVariable String user_no, HttpServletResponse response) {
+        String avatarPath = "c:/upload/avatar/" + user_no + ".png";
         File file = new File(avatarPath);
         if (!file.exists()) { // 아바타 등록이 없는 경우, 디폴트 아바타 이미지 사용
             file = new File("C:/upload/avatar/unknown.png");
@@ -46,15 +45,15 @@ public class MemberController {
         UploadFiles.downloadImage(response, file);
     }
 
-    @PutMapping("/{username}")
+    @PutMapping("/{user_no}")
     public ResponseEntity<MemberDTO> updateProfileOrPassword(
-            @PathVariable String username,
+            @PathVariable String user_no,
             @ModelAttribute MemberUpdateDTO member) {
 
         // 비밀번호가 변경되는 경우 처리
         if (member.getNewPassword() != null && !member.getNewPassword().isEmpty()) {
             ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO();
-            changePasswordDTO.setUsername(username);
+            changePasswordDTO.setUser_no(user_no);
             changePasswordDTO.setOldPassword(member.getOldPassword());
             changePasswordDTO.setNewPassword(member.getNewPassword());
             service.changePassword(changePasswordDTO);

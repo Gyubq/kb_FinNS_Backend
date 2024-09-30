@@ -3,57 +3,59 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.scoula.member.mapper.MemberMapper">
-    <resultMap id="authMap" type="AuthVO">
-        <result property="username" column="username"/>
-        <result property="auth" column="auth"/>
-    </resultMap
-    >
+
+    <!-- MemberVO의 매핑 설정 -->
     <resultMap id="memberMap" type="MemberVO">
-        <id property="username" column="username"/>
-        <result property="username" column="username"/>
+        <id property="user_no" column="user_no"/>
+        <result property="user_id" column="user_id"/>
+        <result property="birthdate" column="birthdate"/>
         <result property="password" column="password"/>
-        <result property="email" column="email"/>
-        <result property="birth" column="birth"/>
-        <result property="regDate" column="reg_date"/>
-        <result property="updateDate" column="update_date"/>
-        <collection property="authList" resultMap="authMap"/>
-    </resultMap
-    >
+        <result property="mbti_no" column="mbti_no"/>
+        <result property="user_img_url" column="user_img_url"/>
+        <result property="update_date" column="update_date"/>
+        <!-- 권한 목록 매핑 (authList) -->
+        <!-- <collection property="authList" resultMap="authMap"/> -->
+    </resultMap>
+
+    <!-- 회원 정보 업데이트 쿼리 (이메일, 비밀번호, 이름 등) -->
     <update id="update">
-        UPDATE tbl_member
-        SET email       = #{email},
-            password    = #{newPassword},
-            update_date = now()
-        WHERE username = #{username}
+        UPDATE users
+        SET password    = #{newPassword}, <!-- 비밀번호 변경 -->
+        mbti_no     = #{mbti_no},
+        birthdate   = #{birthdate} <!-- 날짜 값 바인딩 -->
+        WHERE user_id = #{user_id}
     </update>
 
+
+    <!-- 비밀번호 변경만을 위한 쿼리 -->
     <update id="updatePassword">
-        UPDATE tbl_member
-        SET password    = #{newPassword},
-            update_date = now()
-        WHERE username = #{username}
+        UPDATE users
+        SET password    = #{newPassword}, <!-- 새로운 비밀번호 -->
+        update_date = now()
+        WHERE user_id = #{user_id}
     </update>
 
+    <!-- 특정 회원의 정보 가져오기 쿼리 -->
     <select id="get" resultMap="memberMap">
-        SELECT m.username, password, email,birth, reg_date, update_date, auth
-        FROM tbl_member m
-                 LEFT OUTER JOIN tbl_member_auth a
-                                 ON m.username = a.username
-        where m.username = #{username}
+        SELECT m.user_no, m.user_id, m.birthdate, m.password, m.mbti_no, m.user_img_url, m.update_date
+        FROM users m
+        WHERE m.user_id = #{user_id}
     </select>
-    <select id="findByUsername" resultType="MemberVO">
+
+    <!-- 사용자 아이디로 회원 검색 -->
+    <select id="findById" resultType="MemberVO">
         SELECT *
-        FROM tbl_member
-        WHERE username = #{username}
+        FROM users
+        WHERE user_id = #{user_id}
     </select>
 
+
+    <!-- 새로운 회원 등록 -->
     <insert id="insert">
-        INSERT INTO tbl_member
-        VALUES (#{username}, #{password}, #{email},#{birth}, now(), now())
+        INSERT INTO users (user_id, password, birthdate, mbti_no, user_img_url, update_date)
+        VALUES (#{user_id}, #{password}, #{birthdate}, #{mbti_no}, #{user_img_url}, now())
     </insert>
 
-    <insert id="insertAuth">
-        INSERT INTO tbl_member_auth(username, auth)
-        VALUES (#{username}, #{auth})
-    </insert>
+
+
 </mapper>

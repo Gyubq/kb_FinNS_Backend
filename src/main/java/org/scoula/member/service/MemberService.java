@@ -6,19 +6,21 @@ import org.scoula.member.dto.MemberJoinDTO;
 import org.scoula.member.dto.MemberUpdateDTO;
 
 public interface MemberService {
+
     /**
-     * 사용자 이름 중복 체크
-     * @param username 사용자 이름
+     * 사용자 ID 중복 체크
+     * @param userId 사용자 ID
      * @return 중복 여부 (true: 중복됨, false: 중복되지 않음)
      */
-    boolean checkDuplicate(String username);
+
+    boolean findById(String userId);
 
     /**
      * 사용자 정보 조회
-     * @param username 사용자 이름
+     * @param userId 사용자 ID
      * @return 사용자 정보 DTO
      */
-    MemberDTO get(String username);
+    MemberDTO get(String userId);
 
     /**
      * 회원 가입 처리

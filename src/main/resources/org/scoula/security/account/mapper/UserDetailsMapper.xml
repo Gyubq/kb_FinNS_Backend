@@ -2,30 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.scoula.security.account.mapper.UserDetailsMapper">
 
-    <resultMap id="authMap" type="AuthVO">
-        <result property="username" column="username"/>
-        <result property="auth" column="auth"/>
-    </resultMap>
+    <!-- AuthVO에 대한 매핑 -->
+<!--    <resultMap id="authMap" type="AuthVO">-->
+<!--        <result property="user_id" column="user_id"/>-->
+<!--        <result property="auth" column="auth"/>-->
+<!--    </resultMap>-->
 
-    <!--    <resultMap id="memberMap" type="org.scoula.security.account.domain.MemberVO">-->
+    <!-- MemberVO에 대한 매핑 -->
     <resultMap id="memberMap" type="MemberVO">
-        <id property="username" column="username"/>
-        <result property="username" column="username"/>
+        <id property="user_id" column="user_id"/>
+        <result property="user_id" column="user_id"/>
         <result property="password" column="password"/>
-        <result property="email" column="email"/>
-        <result property="birth" column="birth"/>
-        <result property="regDate" column="reg_date"/>
-        <result property="updateDate" column="update_date"/>
-
-        <!--        이녀석만 없었더라면...-->
-        <collection property="authList" resultMap="authMap"/>
+        <result property="birthdate" column="birth"/>
+        <result property="update_date" column="update_date"/>
+        <!-- authList 매핑 -->
+<!--        <collection property="authList" resultMap="authMap"/>-->
     </resultMap>
 
+    <!-- 사용자 정보와 권한을 조회하는 쿼리 -->
     <select id="get" resultMap="memberMap">
-        select m.username, password, email, birth, reg_date, update_date, auth
-        from tbl_member m
-                 left outer join tbl_member_auth a
-                                 on m.username = a.username
-        where m.username = #{username}
+        select m.user_id, password, email, birthdate, reg_date, update_date
+        from users m
+        where m.user_id = #{user_id}
     </select>
 </mapper>
